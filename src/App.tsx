@@ -1,8 +1,7 @@
-import Tree from "./components/Tree";
 import "./App.css";
 
 function App() {
-  return <Tree />;
+  return <div>Hello World</div>;
 }
 
 export default App;
