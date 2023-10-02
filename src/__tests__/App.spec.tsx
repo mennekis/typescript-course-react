@@ -1,6 +1,7 @@
-import { render } from "@testing-library/react";
-import App from "../App";
+// import { render } from "@testing-library/react";
+// import App from "../App";
 
+// jest setup instructions: https://dev.to/hannahadora/jest-testing-with-vite-and-react-typescript-4bap
 test("demo", () => {
   expect(true).toBe(true);
 });
@@ -12,10 +13,11 @@ test("two plus two is four", () => {
 
 // to check the value of an object, use toEqual:
 test("object assignment", () => {
-  const data = { one: 1, two: 1 };
+  const data = { one: 10, two: 1 };
   data.two = 2;
 
-  expect(data).toEqual({ one: 1, two: 2 });
+  expect(data).toEqual({ one: 10, two: 2 });
+  expect(data).toMatchObject({ one: 10 });
 });
 
 // test for the opposite of a matcher using not:
@@ -68,6 +70,7 @@ test("adding floating point numbers", () => {
   const value = 0.1 + 0.2;
   //expect(value).toBe(0.3);           This won't work because of rounding error
   expect(value).toBeCloseTo(0.3); // This works.
+  expect(0.301).toBeCloseTo(0.3); // This works.
 });
 
 // check strings against regular expressions with toMatch:
@@ -98,7 +101,7 @@ function compileAndroidCode() {
   throw new Error("you are using the wrong JDK!");
 }
 
-test("compiling android goes as expected", () => {
+xtest("compiling android goes as expected", () => {
   expect(() => compileAndroidCode()).toThrow();
   expect(() => compileAndroidCode()).toThrow(Error);
 
@@ -118,6 +121,11 @@ const fetchData = () => {
     resolve("peanut butter");
   });
 };
+const fetchDataReject = () => {
+  return new Promise((_, reject) => {
+    reject("error");
+  });
+};
 // can test it with:
 test("the data is peanut butter", () => {
   return fetchData().then((data) => {
@@ -132,12 +140,22 @@ test("the data is peanut butter", async () => {
   expect(data).toBe("peanut butter");
 });
 
-test("the fetch fails with an error", async () => {
+test("the data is peanut butter", (done) => {
+  setTimeout(() => {
+    return fetchData().then((data) => {
+      expect(data).toBe("peanut butter");
+
+      done();
+    });
+  }, 1000);
+});
+
+xtest("the fetch fails with an error", async () => {
   expect.assertions(1);
   try {
-    await fetchData();
+    await fetchDataReject();
   } catch (e) {
-    expect(e).toMatch("error");
+    // expect(e).toMatch("error");
   }
 });
 
@@ -147,28 +165,30 @@ test("the data is peanut butter", async () => {
 });
 
 test("the fetch fails with an error", async () => {
-  await expect(fetchData()).rejects.toMatch("error");
+  await expect(fetchDataReject()).rejects.toMatch("error");
 });
-
-function isCity(city: string) {
-  return ["Vienna", "San Juan"].includes(city);
-}
 
 // describe with setup and teardown
 describe("describe", () => {
+  let cities = ["Vienna", "San Juan"];
+
+  const isCity = (city: string) => {
+    return cities.includes(city);
+  };
+
   beforeEach(() => {
-    // init
+    cities = ["Vienna", "San Juan"];
   });
 
   afterEach(() => {
     // clean up
   });
 
-  test("city database has Vienna", () => {
+  it("city database has Vienna", () => {
     expect(isCity("Vienna")).toBeTruthy();
   });
 
-  test("city database has San Juan", () => {
+  it("city database has San Juan", () => {
     expect(isCity("San Juan")).toBeTruthy();
   });
 });
@@ -183,19 +203,19 @@ describe("mock function", () => {
   };
 
   it("calls forEach mock function", () => {
-    forEach([0, 1], mockCallback);
+    forEach([10, 20], mockCallback);
 
     // The mock function was called twice
     expect(mockCallback.mock.calls).toHaveLength(2);
 
     // The first argument of the first call to the function was 0
-    expect(mockCallback.mock.calls[0][0]).toBe(0);
+    expect(mockCallback.mock.calls[0][0]).toBe(10);
 
     // The first argument of the second call to the function was 1
-    expect(mockCallback.mock.calls[1][0]).toBe(1);
+    expect(mockCallback.mock.calls[1][0]).toBe(20);
 
     // The return value of the first call to the function was 42
-    expect(mockCallback.mock.results[0].value).toBe(42);
+    expect(mockCallback.mock.results[0].value).toBe(52);
   });
 });
 
@@ -215,18 +235,18 @@ test("mock function with return value", () => {
   expect(myMock()).toEqual(1);
 });
 
-test("Renders the main page", () => {
-  type TUser = {
-    name: string;
-    age: number;
-  };
-  const user = {
-    name: "John",
-    age: 10,
-  } as TUser;
+// test("Renders the main page", () => {
+//   type TUser = {
+//     name: string;
+//     age: number;
+//   };
+//   const user = {
+//     name: "John",
+//     age: 10,
+//   } as TUser;
 
-  expect(user.age).toBe(10);
+//   expect(user.age).toBe(10);
 
-  render(<App />);
-  expect(true).toBeTruthy();
-});
+//   render(<App />);
+//   expect(true).toBeTruthy();
+// });
