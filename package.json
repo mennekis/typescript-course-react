@@ -19,12 +19,14 @@
     "@mui/material": "^5.13.6",
     "@mui/styled-engine-sc": "^5.12.0",
     "@reduxjs/toolkit": "^1.9.5",
+    "@types/styled-components": "^5.1.28",
     "jest-environment-jsdom": "^29.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.1.1",
     "redux": "^4.2.1",
     "redux-devtools-extension": "^2.13.9",
+    "reset-css": "^5.0.2",
     "styled-components": "^5.3.11"
   },
   "devDependencies": {
