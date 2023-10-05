@@ -42,6 +42,12 @@ export function Users() {
 
   // TODO: pass handleDelete to User component
 
+  // TODO: Add "Move Up" and "Move Down" buttons to each of the user
+  // TODO: Implement functions to move user up/down the list
+  // TODO: Make sure you create new list of users, do not mutate existing list
+  // TODO: Call setUsers with new list of users
+  // TODO: Pass handleMoveUp and handleMoveDown to User component as props
+
   return (
     <ul>
       {users.map((user) => (
