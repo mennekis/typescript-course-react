@@ -1,8 +1,17 @@
+import React, { useEffect, useState } from "react";
 import usersData from "../users-data";
 import { TUser } from "../users-data";
 
 interface IUserProps {
-  data: TUser;
+   data: TUser;
+}
+interface IFormData {
+   firstName: string;
+   lastName: string;
+   hairColor: string;
+   birthDate: string;
+   isFemale: boolean;
+   email: string;
 }
 
 // # Users list and form with api
@@ -27,23 +36,196 @@ interface IUserProps {
 // 8. Show error message for invalid fields
 
 const User = (props: IUserProps) => {
-  const { data } = props;
+   const { data } = props;
 
-  return (
-    <li>
-      {data.firstName} {data.lastName}
-    </li>
-  );
+   return (
+      <li>
+         <div>
+            {data.firstName} {data.lastName}
+            <div>{data.age}</div>
+            <div>{data.gender}</div>
+            <div>{data.phone}</div>
+            <img src={data.image} />
+         </div>
+      </li>
+   );
 };
 
 export function Users() {
-  return (
-    <ul>
-      {usersData.map((user) => (
-        <User data={user} key={user.id} />
-      ))}
-    </ul>
-  );
-}
+   const [users, setUsers] = useState([]);
+   const [loading, setLoading] = useState(true);
+   const [showCreateUserForm, setShowCreateUserForm] = useState(false);
+   const [formData, setFormData] = useState<IFormData>({
+      firstName: "",
+      lastName: "",
+      hairColor: "",
+      birthDate: "",
+      isFemale: false,
+      email: "",
+   });
+   const [errors, setErrors] = useState<Partial<IFormData>>({});
+   useEffect(() => {
+      fetch("http://localhost:3004/users")
+         .then((resp) => resp.json())
+         .then((data) => {
+            console.log(data);
+            setUsers(data);
+            setLoading(false);
+         })
+         .catch((error) => {
+            console.error("Error fetching user data: ", error);
+            setLoading(false);
+         });
+   }, []);
 
+   const openCreateUserForm = () => {
+      setShowCreateUserForm(true);
+   };
+   const closeCreateUserForm = () => {
+      setShowCreateUserForm(false);
+      // Clear form data and errors when the form is closed
+      setFormData({
+         firstName: "",
+         lastName: "",
+         hairColor: "",
+         birthDate: "",
+         isFemale: false,
+         email: "",
+      });
+      setErrors({});
+   };
+
+   const validateForm = () => {
+      const newErrors: Partial<IFormData> = {};
+
+      if (!formData.firstName.trim()) {
+         newErrors.firstName = "First name is required";
+      }
+
+      if (!formData.lastName.trim()) {
+         newErrors.lastName = "Last name is required";
+      }
+
+      if (
+         !formData.email.trim() ||
+         !formData.email.match(/^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/)
+      ) {
+         newErrors.email = "Invalid email address";
+      }
+
+      if (!formData.birthDate.trim() || isNaN(Date.parse(formData.birthDate))) {
+         newErrors.birthDate = "Invalid birth date";
+      }
+
+      setErrors(newErrors);
+
+      return Object.keys(newErrors).length === 0;
+   };
+
+   const handleFormSubmit = () => {
+      if (validateForm()) {
+         // Handle the form submission, for example, send data to the API
+         // You can add the logic to send the new user data to the server here
+         // After successful submission, close the form
+         closeCreateUserForm();
+      } else {
+      }
+   };
+
+   return (
+      <div>
+         <button onClick={openCreateUserForm}>Add new user</button>
+         {loading ? (
+            <p>Loading...</p>
+         ) : (
+            <ul>
+               {users.map((user) => (
+                  <User data={user} key={user.id} />
+               ))}
+            </ul>
+         )}
+         {showCreateUserForm && (
+            <div>
+               <h2>Create New User</h2>
+               <form>
+                  <label>First Name:</label>
+                  <input
+                     type='text'
+                     name='firstName'
+                     value={formData.firstName}
+                     onChange={(e) =>
+                        setFormData({ ...formData, firstName: e.target.value })
+                     }
+                  />
+                  {errors.firstName && (
+                     <p className='error'>{errors.firstName}</p>
+                  )}
+
+                  <label>Last Name:</label>
+                  <input
+                     type='text'
+                     name='lastName'
+                     value={formData.lastName}
+                     onChange={(e) =>
+                        setFormData({ ...formData, lastName: e.target.value })
+                     }
+                  />
+                  {errors.lastName && (
+                     <p className='error'>{errors.lastName}</p>
+                  )}
+
+                  <label>Hair Color:</label>
+                  <input
+                     type='text'
+                     name='hairColor'
+                     value={formData.hairColor}
+                     onChange={(e) =>
+                        setFormData({ ...formData, hairColor: e.target.value })
+                     }
+                  />
+
+                  <label>Birth Date:</label>
+                  <input
+                     type='date'
+                     name='birthDate'
+                     value={formData.birthDate}
+                     onChange={(e) =>
+                        setFormData({ ...formData, birthDate: e.target.value })
+                     }
+                  />
+                  {errors.birthDate && (
+                     <p className='error'>{errors.birthDate}</p>
+                  )}
+
+                  <label>Is Female:</label>
+                  <input
+                     type='checkbox'
+                     name='isFemale'
+                     checked={formData.isFemale}
+                     onChange={(e) =>
+                        setFormData({ ...formData, isFemale: e.target.checked })
+                     }
+                  />
+
+                  <label>Email:</label>
+                  <input
+                     type='email'
+                     name='email'
+                     value={formData.email}
+                     onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                     }
+                  />
+                  {errors.email && <p className='error'>{errors.email}</p>}
+               </form>
+
+               <button onClick={handleFormSubmit} disabled={!validateForm()}>
+                  Submit
+               </button>
+               <button onClick={closeCreateUserForm}>Cancel</button>
+            </div>
+         )}
+      </div>
+   );
+}
 export default Users;
