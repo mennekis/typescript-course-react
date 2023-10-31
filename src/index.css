@@ -27,11 +27,8 @@ body {
    min-width: 320px;
    min-height: 100vh;
 }
-button {
-   margin-right: 20px;
-   margin-left: 5px;
-}
-ul li {
-   margin-bottom: 8px;
-   padding-left: 20px;
+
+fieldset.filter label {
+   display: inline-block;
+   margin-right: 8px;
 }
