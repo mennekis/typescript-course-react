@@ -24,7 +24,7 @@ export function App() {
          {/* <UseDeferredValueDemo /> */}
 
          {/* <UseReducerDemo /> */}
-         <CustomHookDemo />
+         {/* <CustomHookDemo /> */}
       </>
    );
 }
