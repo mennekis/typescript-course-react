@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import usersData from "../users-data";
 import { TUser } from "../users-data";
 
 interface IUserProps {
    data: TUser;
 }
 interface IFormData {
+   id: number;
+   position: number;
    firstName: string;
    lastName: string;
    hairColor: string;
@@ -39,7 +40,7 @@ const User = (props: IUserProps) => {
    const { data } = props;
 
    return (
-      <li>
+      <li key={data.id}>
          <div>
             {data.firstName} {data.lastName}
             <div>{data.age}</div>
@@ -52,10 +53,12 @@ const User = (props: IUserProps) => {
 };
 
 export function Users() {
-   const [users, setUsers] = useState([]);
-   const [loading, setLoading] = useState(true);
-   const [showCreateUserForm, setShowCreateUserForm] = useState(false);
+   const [users, setUsers] = useState<TUser[]>([]);
+   const [loading, setLoading] = useState<boolean>(true);
+   const [showCreateUserForm, setShowCreateUserForm] = useState<boolean>(false);
    const [formData, setFormData] = useState<IFormData>({
+      id: 0,
+      position: 0,
       firstName: "",
       lastName: "",
       hairColor: "",
@@ -64,10 +67,11 @@ export function Users() {
       email: "",
    });
    const [errors, setErrors] = useState<Partial<IFormData>>({});
-   useEffect(() => {
-      fetch("http://localhost:3004/users")
+
+   const fetchUsers = () => {
+      fetch("http://localhost:3000/users")
          .then((resp) => resp.json())
-         .then((data) => {
+         .then((data: TUser[]) => {
             console.log(data);
             setUsers(data);
             setLoading(false);
@@ -76,6 +80,10 @@ export function Users() {
             console.error("Error fetching user data: ", error);
             setLoading(false);
          });
+   };
+
+   useEffect(() => {
+      fetchUsers();
    }, []);
 
    const openCreateUserForm = () => {
@@ -85,6 +93,8 @@ export function Users() {
       setShowCreateUserForm(false);
       // Clear form data and errors when the form is closed
       setFormData({
+         id: 0,
+         position: 0,
          firstName: "",
          lastName: "",
          hairColor: "",
@@ -127,8 +137,25 @@ export function Users() {
          // Handle the form submission, for example, send data to the API
          // You can add the logic to send the new user data to the server here
          // After successful submission, close the form
-         closeCreateUserForm();
-      } else {
+         const newUser: IFormData = { ...formData };
+         fetch("http://localhost:3000/users", {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newUser),
+         })
+            .then((resp) => resp.json())
+            .then((data: TUser) => {
+               console.log("User created:", data);
+
+               // Закрытие формы и обновление списка пользователей
+               closeCreateUserForm();
+               fetchUsers();
+            })
+            .catch((error) => {
+               console.error("Error creating user: ", error);
+            });
       }
    };
 

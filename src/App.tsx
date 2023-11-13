@@ -1,30 +1,13 @@
-import "./App.css";
-import { Lesson17Homework } from "./lesson17-homework";
-import { Users } from "./lesson14/Users-homework";
 import { useState } from "react";
+import "./App.css";
+import { Users } from "./lesson14/Users-homework";
 
 export function App() {
+   const [show, setShow] = useState(true);
    return (
       <>
-         {/* <LoginForm onSubmit={console.log} /> */}
-         {/* <UseRefDemo /> */}
-         {/* <UseMemoDemo /> */}
-         {/* <StateProvider>
-        <Users />
-      </StateProvider> */}
-         {/* <UseIdDemo />
-      <UseIdDemo />
-      <Xyz />
-      <Xyz />
-      <Xyz />
-      <Xyz />
-      <UseIdDemo /> */}
-         {/* <RefProblemDemo /> */}
-         {/* <UseImperativeHandleDemo /> */}
-         {/* <UseDeferredValueDemo /> */}
-
-         {/* <UseReducerDemo /> */}
-         {/* <CustomHookDemo /> */}
+         <button onClick={() => setShow(!show)}>Show / Hide User</button>
+         {show ? <Users /> : null}
       </>
    );
 }
